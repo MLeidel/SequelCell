@@ -1,0 +1,13 @@
+# sql1.txt
+# Verify column computations
+
+Input;
+ordership/ship.xlsx
+0
+shp
+
+SQL;
+#select order_id, (units_sold * unit_price), revenue from shp
+#select order_id, (units_sold * unit_cost), cost from shp
+select order_id, (revenue - cost), printf("$%.2f", profit) from shp
+

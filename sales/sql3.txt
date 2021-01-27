@@ -1,0 +1,27 @@
+# sql3.txt
+# customers not living in same city as their sales agent
+
+Input;
+sales/orders.xlsx
+0
+o
+
+Input;
+sales/salesman.xlsx
+0
+s
+
+Input;
+sales/customer.xlsx
+0
+c
+
+SQL;
+select ord_no, c.last_name, o.customer_id, o.salesman_id, s.city, c.city 
+	from s, c, o
+	WHERE c.city <> s.city
+	AND o.customer_id = c.customer_id
+	AND o.salesman_id = id
+ 
+
+

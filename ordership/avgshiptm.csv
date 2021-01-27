@@ -1,0 +1,2 @@
+"""For avg units sold""",AVG(units_sold),"""The Avg time to ship is....""",AVG(julianday(ship_date) - julianday(order_date)),"""days."""
+For avg units sold,5053.988,The Avg time to ship is....,25.001,days.

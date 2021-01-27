@@ -1,0 +1,28 @@
+# Which orders of "food items" where under 1000 units?
+# sql6.txt
+Input;
+ordership/orders.xlsx
+0
+ord
+Input;
+ordership/ship.xlsx
+0
+shp
+Output;
+ordership/lowOrders.xlsx
+
+SQL;
+select shp.order_id, units_sold, 
+		substr(ship_date,1,10), region, country
+	from ord, shp
+	where item_type 
+	in ("Vegetables", 
+		"Baby Food", "Cereal", 
+		"Fruits", "Snacks",
+		"Beverages", "Meat")
+	and ord.order_id = shp.order_id
+	and units_sold < 1000
+	order by units_sold asc
+
+
+

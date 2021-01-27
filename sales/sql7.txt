@@ -1,0 +1,13 @@
+# sql7.txt : Find sales amount by month
+
+Input;
+sales/orders.xlsx
+0
+ord
+
+SQL;
+select sum(purch_amt), ord_date from ord
+	group by substr(ord_date,6,2)
+
+
+

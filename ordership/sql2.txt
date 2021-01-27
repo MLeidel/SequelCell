@@ -1,0 +1,21 @@
+# total revenue in 2014 by country
+# sql2.txt
+
+Input;
+ordership/orders.xlsx
+0
+ord
+
+Input;
+ordership/ship.xlsx
+0
+shp
+
+SQL;
+select substr(ship_date,1,10), country, sum(revenue) from shp
+	JOIN ord on shp.order_id = ord.order_id 
+	group by country
+	having ship_date between '2013-12-31' and '2015-01-01'
+	order by 1
+
+

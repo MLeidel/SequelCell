@@ -1,0 +1,19 @@
+# sql2.txt
+# all orders with customer's name on the order
+
+Input;
+/home/ml/apps/python/projects/sqlcel/sales/orders.xlsx
+0
+orders
+
+Input;
+/home/ml/apps/python/projects/sqlcel/sales/customer.xlsx
+0
+custs
+
+SQL;
+
+select ord_no, first_name, last_name from orders, custs
+	where orders.customer_id = custs.customer_id
+
+

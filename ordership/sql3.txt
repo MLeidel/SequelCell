@@ -1,0 +1,26 @@
+# Days it took to ship the order
+# sql3.txt
+
+Input;
+ordership/orders.xlsx
+0
+ord
+
+Input;
+ordership/ship.xlsx
+0
+shp
+
+SQL;
+select shp.order_id, units_sold, 
+	substr(order_date,1,10), substr(ship_date,1,10), 
+       (julianday(ship_date) - julianday(order_date)) 
+	from shp, ord
+	where shp.order_id = ord.order_id
+	order by 3
+
+
+
+
+
+

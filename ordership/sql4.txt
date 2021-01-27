@@ -1,0 +1,24 @@
+# Average Time it's taking to ship an order
+# sql4.txt
+
+Input;
+ordership/orders.xlsx
+0
+ord
+
+Input;
+ordership/ship.xlsx
+0
+shp
+
+Output;
+ordership/avgshiptm.csv
+
+SQL;
+select AVG(units_sold),  
+       AVG(julianday(ship_date) - julianday(order_date)) 
+	from shp, ord
+		where shp.order_id = ord.order_id
+
+
+

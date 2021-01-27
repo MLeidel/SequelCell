@@ -1,0 +1,12 @@
+Input;
+sqlite/yasnip.db
+snippet
+tbl
+
+Output;
+sqlite/out.db
+
+SQL;
+SELECT * from tbl limit 10
+
+

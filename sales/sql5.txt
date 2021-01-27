@@ -1,0 +1,20 @@
+# sql5.txt amounts sold by salesman from most to least
+#
+Input;
+sales/salesman.xlsx
+0
+sal
+
+Input;
+sales/orders.xlsx
+0
+ord
+
+SQL;
+select last_name, salesman_id, sum(purch_amt) Total
+	from sal, ord
+		where id = salesman_id
+	group by last_name
+	order by Total desc
+
+

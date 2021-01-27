@@ -1,0 +1,18 @@
+# sql1.txt : customers with their salesman
+Input;
+sales/salesman.xlsx
+0
+salesman
+
+Input;
+sales/customer.xlsx
+0
+customer
+
+SQL;
+
+select c.last_name, s.last_name 
+	from customer c, salesman s
+		where id = c.salesman_id
+
+

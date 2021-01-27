@@ -1,0 +1,32 @@
+Input;
+sqlite/donors.db
+tbldonor
+members
+
+Input;
+sqlite/donors.db
+tbldonation
+donate
+
+Input;
+sqlite/donors.db
+tblevent
+events
+
+Output;
+sqlite/donor_tots.xlsx
+
+Sql;
+#select last_name, amount_paid, event_name, event_date
+#	from members, donate, events
+#	where member_rowid = members.rowid
+#	and event_rowid = events.rowid
+#	order by event_date, yrseq
+
+select first_name, last_name, sum(amount_paid), count(*) events
+	from members, donate, events
+	where member_rowid = members.rowid
+	and event_rowid = events.rowid
+	group by last_name
+	
+

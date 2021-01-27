@@ -1,0 +1,19 @@
+# sql4.txt
+# List custmers with 'their' sales person using join
+
+Input;
+sales/customer.xlsx
+0
+c
+
+Input;
+sales/salesman.xlsx
+0
+s
+
+SQL;
+select c.first_name, c.last_name, c.city, s.last_name, s.city
+	from c
+	join s on c.salesman_id = s.id
+
+
