@@ -102,6 +102,7 @@ When using Sqlite for output file the table name will always be "table1".
 Use ".db" for the Sqlite output file's extention.
 
 __`SQL;`__ 
+
 : indicates the SQL select statement is to follow.
 
 Example:
@@ -116,6 +117,7 @@ select sal.Item, sum(Amount), sum(Cost), count(*),
 Everything beyond the **"Sql;"** tag is part of the sql select statement.  
 
 __`#`__ 
+
 : indicates a comment line (only at beginning of line)  
 : Blank lines and comments are discarded when  
 : the code file is parsed.  
