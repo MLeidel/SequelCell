@@ -1,9 +1,3 @@
-<style>
-body {
-  font: normal 12pt/14pt sans-serif;
-}
-</style>
-
 # SequelCell
 
 **SequelCell is a desktop app lets you easily combine data from  
