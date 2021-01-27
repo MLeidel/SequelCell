@@ -1,6 +1,6 @@
 # SequelCell
 
-**SequelCell is a desktop app lets you easily combine data from  
+**SequelCell is a desktop app where you can easily combine data from  
 several different input types and assess them using standard  
 SQL language statements.**
 
