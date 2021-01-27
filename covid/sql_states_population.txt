@@ -1,0 +1,20 @@
+# sql_states_population.txt
+# list total deaths in states with populations 
+# less than the average state population
+Input;
+covid/USpop.xlsx
+0
+popul
+
+Input;
+covid/US_covid19_1-21.csv
+0
+states
+
+Sql;
+SELECT states.state, total_deaths, pop2020, densit
+	FROM states, popul
+	WHERE states.state = popul.state
+	AND pop2020 < (SELECT AVG(pop2020) FROM popul)
+	ORDER BY total_deaths DESC
+

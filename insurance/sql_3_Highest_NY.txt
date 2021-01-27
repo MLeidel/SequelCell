@@ -1,0 +1,21 @@
+# What are the 3 highest insured in NY ?
+# needs two tables to get all information
+
+Input;
+insurance/sampledatainsurance.xlsx
+0
+tblins
+
+Input;
+insurance/sampledatainsnames.xlsx
+0
+tblname
+
+Sql;
+SELECT tblins.policy, insuredvalue, last_name, first_name, email, businesstype
+	FROM tblins
+	JOIN tblname ON tblins.policy = tblname.policy
+	WHERE state = 'NY'
+	ORDER BY insuredvalue DESC LIMIT 3
+
+

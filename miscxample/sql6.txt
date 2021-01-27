@@ -1,0 +1,11 @@
+# sql6.txt - Aggregating to find top monthly sales
+
+Input;
+miscxample/sample-xlsx-file-for-testing.xlsx
+0
+tbl
+
+SQL;
+select country, year, month_number, max(units_sold) from tbl
+	group by year, month_number
+

@@ -1,0 +1,29 @@
+# Who has auto and home ins in NY
+# needs two tables to get all information
+
+Input;
+insurance/sampledatainsurance.xlsx
+0
+tblins
+
+Input;
+insurance/sampledatainsnames.xlsx
+0
+tblname
+
+Sql;
+SELECT tblins.policy, last_name, first_name, email 
+	FROM tblins
+	JOIN tblname ON tblins.policy = tblname.policy
+	WHERE state = 'NY'
+	AND home = 'Y'
+	ORDER BY last_name
+
+# Can also do this without using 'JOIN'
+#SELECT tblins.policy, last_name, first_name, email 
+#	FROM tblins, tblname
+#	WHERE tblins.policy = tblname.policy
+#	AND state = 'NY'
+#	AND home = 'Y'
+#	ORDER BY last_name
+

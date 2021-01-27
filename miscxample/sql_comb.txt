@@ -1,0 +1,18 @@
+# Example using one file and two sheets
+# use 1|cost for "cost" sheet
+# use 0|sales for "sales" sheet
+
+Input;
+miscxample/combined.xlsx
+1
+cst
+
+Input;
+miscxample/combined.xlsx
+sales
+sal
+
+sql;
+select distinct cst.item, cost, amount from cst, sal
+	where cst.item = sal.item
+

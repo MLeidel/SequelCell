@@ -1,0 +1,13 @@
+# Finding max total cases by continent
+
+Input;
+covid/owid-covid-data.xlsx
+0
+tbl
+
+SQL;
+SELECT continent, location, max(total_cases) total, population
+	FROM tbl
+	GROUP BY location
+	ORDER BY continent, total
+

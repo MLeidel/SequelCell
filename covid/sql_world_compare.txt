@@ -1,0 +1,16 @@
+# Compare total cases and populations
+
+Input;
+covid/owid-covid-data.xlsx
+0
+tbl
+
+SQL;
+SELECT continent, location, max(total_cases) total, population
+	FROM tbl
+	WHERE location <> 'World'
+	AND location <> 'NaN'
+	GROUP BY location
+	ORDER BY total DESC
+	LIMIT 12
+

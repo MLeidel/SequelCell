@@ -1,0 +1,18 @@
+# Compare to India
+
+Input;
+covid/owid-covid-data.xlsx
+0
+tbl
+
+SQL;
+SELECT continent, location, max(total_cases) total, population, population_density, total_deaths
+	FROM tbl
+	WHERE location <> 'World'
+	AND location <> 'NaN'
+	AND (location = 'United States' 
+	OR   location = 'India')
+	GROUP BY location
+	ORDER BY total DESC
+
+

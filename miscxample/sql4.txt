@@ -1,0 +1,21 @@
+# sql4.txt : AVG function - by gender
+
+Input;
+miscxample/Sample-excel-file-with-employee-data.xlsx
+0
+tbl
+
+SQL;
+
+select Gender, ROUND(avg(Salary)) from tbl
+	group by Gender
+	order by Salary desc
+
+
+
+
+
+
+
+
+

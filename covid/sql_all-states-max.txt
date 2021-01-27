@@ -1,0 +1,14 @@
+# States
+Input;
+covid/all-states-history.xlsx
+0
+tbl
+
+Output;
+covid/all-states-max-output.xlsx
+
+SQL;
+SELECT state, max(positive) pos, max(death)
+	FROM tbl
+	GROUP BY state
+	ORDER BY pos DESC

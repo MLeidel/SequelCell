@@ -1,0 +1,19 @@
+# sql1.txt - Titanic stats spreadsheet
+
+Input;
+miscxample/titanic3.xls
+0
+tbl
+
+SQL;
+select * from tbl where `home.dest` like '%WI' order by `home.dest`;
+
+#select distinct `home.dest` from tbl
+
+#select * from tbl
+#	where sex = 'female'
+#	and survived = 0
+#	and age < 10
+#order by age
+
+

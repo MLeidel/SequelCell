@@ -1,0 +1,24 @@
+# sql3.txt uses mt_sales
+
+Input;
+miscxample/mt_sales.xlsx
+0
+sales
+
+Input;
+miscxample/mt_cost.xlsx
+0
+costs
+
+#Output;
+#miscxample/mt_profit.xlsx
+
+SQL;
+
+select sales.Item, sum(Amount), sum(Cost), count(*), 
+		 sum((Amount - Cost)) 'Profit'
+    from sales, costs
+    group by sales.Item
+    order by sum((Amount - Cost))
+
+

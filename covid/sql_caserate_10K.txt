@@ -1,0 +1,14 @@
+# Highest case rate per 10K CDC data from 12/28/2020
+
+Input;
+covid/UScovid_12-28.xlsx
+0
+tbl
+
+SQL;
+SELECT state, total_cases, case_rate_per_100000
+	FROM tbl
+	ORDER BY case_rate_per_100000 DESC LIMIT 10
+
+
+

@@ -1,0 +1,22 @@
+# Same query as sql3.txt but here using one file and two sheets
+# see sql_comb.txt also
+# use 1|cost for "cost" sheet
+# use 0|sales for "sales" sheet
+
+Input;
+miscxample/combined.xlsx
+1
+cst
+
+Input;
+miscxample/combined.xlsx
+sales
+sal
+
+sql;
+select sal.Item, sum(Amount), sum(Cost), count(*), 
+		 sum((Amount - Cost)) 'Profit'
+    from sal, cst
+    group by sal.Item
+    order by sum((Amount - Cost))
+

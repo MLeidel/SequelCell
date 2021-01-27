@@ -1,0 +1,14 @@
+#Highest 10 States Covid Cases CDC data from 12/28/2020
+
+Input;
+covid/UScovid_12-28.xlsx
+0
+tbl
+
+SQL;
+SELECT state, total_cases, total_deaths, cases_in_last_7_days, 
+		 deaths_in_last_7_days
+	FROM tbl
+	ORDER BY total_cases DESC LIMIT 10
+
+

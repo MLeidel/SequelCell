@@ -1,0 +1,13 @@
+# sql5.txt filtering data
+
+Input;
+miscxample/Sample-sales-data-excel.xlsx
+0
+tbl
+
+SQL;
+select distinct region, customer_name from tbl
+where region = 'South'
+and customer_name like 'J%'
+order by customer_name
+
