@@ -51,7 +51,8 @@ and end with the ";" semi-colon. You can have more than one "__`Input;`__"
 statement. "__`Input;`__" and "__`Output;`__" statements must appear before  
 the "__`SQL;`__" statement.
 
-__`Input;`__ 
+__`Input;`__
+
 : defines the Excel, CSV, or Sqlite input file path, with sheet name
 : or number, or database table name. SQL table name to use in the query.  
 : You can have multiple "__`Input;`__" statements.
