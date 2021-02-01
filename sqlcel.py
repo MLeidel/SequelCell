@@ -17,6 +17,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import iniproc  # ini file reader module (local)
 
+# change working directory to path for this file
+p = os.path.realpath(__file__)
+os.chdir(os.path.dirname(p))
 
 # sql can set its own limits - so open it up
 pd.set_option('display.max_rows', None)
@@ -43,9 +46,23 @@ SQL_file = ""
 RUN_CONSOLE = False
 DF = 0  # copy of displayed df. Used by launch_plotter
 
+def edit_check():
+    ''' Prompting to leave unsaved edits
+        example: if edit_check() is False:
+                    return
+    '''
+    resp = True
+    if code.edit_modified():
+        resp = messagebox.askokcancel('Confirm Edits',
+                                      'Edits not saved\nOK to Leave Editing?')
+    return resp
+
 def open_sql(e=None):
     ''' Dialog to load SQL code file '''
+    print("open_sql")
     global SQL_file
+    if edit_check() is False:
+        return
     fsql = filedialog.askopenfilename(filetypes=(("All text", "*.txt"),
                                                  ("SQL", "*.sql"), ("All", "*.*")))
     if fsql:
@@ -54,6 +71,7 @@ def open_sql(e=None):
             code.delete("1.0", END) # clear the Text widget
             code.insert(END, content) # insert the text
             SQL_file = fsql
+            code.edit_modified(False)
 
 
 def save_sql(e=None):
@@ -79,6 +97,7 @@ def file_save(event=None):
                 code.focus()
                 fh.write(code.get("1.0", END)) # contents of SQL code Text widget
                 # messagebox.showinfo("Save File", "Sql File Saved")
+                code.edit_modified(False)
         except:
             messagebox.showerror("Save File", "Failed to save file\n'%s'" % SQL_file)
         return
@@ -107,6 +126,8 @@ def add_df_src():
 
 def quit_sql(event=None):
     ''' confirm program exit and exit or not '''
+    if edit_check() is False:
+        return
     if messagebox.askokcancel('SequelCell', 'OK to Exit?') is True:
         with open("winfoxy", "w") as fout:
             fout.write(str(root.winfo_x()) + "\n" + str(root.winfo_y()))
@@ -223,7 +244,7 @@ def launch_plotter():
         cx = var_cx.get()
 
         if k == 'TYPE OF PLOT' or x == 'X COLUMN' or y == 'Y COLUMN' or cx == 'COLOR X':
-            messagebox.showerror("Plot Setting Error", "One or more unset parameters")
+            route_msg("Plot Setting Error", "One or more unset parameters", "error")
             return
 
         DF.plot(kind=k, x=x, y=y, color=cx, ax=ax)
@@ -659,6 +680,16 @@ scrollX = Scrollbar(frm_sql, orient=HORIZONTAL, command=code.xview)
 scrollX.grid(row=6, column=2, sticky='sew')
 code['xscrollcommand'] = scrollX.set
 
+splash = '''
+Welcome
+This is the code area.
+Begin coding a query here.
+Or, open an existing query.
+'''
+code.delete("1.0", END) # clear the Text widget
+code.insert(END, splash) # insert the text
+code.edit_modified(False)
+
 #
 # SQL Output Frame
 #
@@ -753,6 +784,7 @@ root.bind('<Control-a>', select_all)
 root.bind('<Escape>', quit_sql)
 root.bind('<Control-e>', processCodeFile)
 root.bind('<Control-o>', open_sql)
+
 
 # root.geometry("200x120") # WxH+left+top
 if os.path.isfile("winfoxy"):
