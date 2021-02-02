@@ -36,6 +36,7 @@ SequelCell has a few Python system requirements:
   - pandas
   - matplotlib
   - sqlalchemy
+  - threading
 
 ### Run as GUI app
 `> python sqlcel.py` 
