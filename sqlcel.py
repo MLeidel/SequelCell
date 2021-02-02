@@ -11,6 +11,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 import os, io
 import logging
+import threading
 from ttkthemes import ThemedTk  # ttkthemes applied to all widgets
 from sqlalchemy import create_engine
 import pandas as pd
@@ -27,19 +28,22 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
-# get sqlcel.ini values here
-fg_, bg_, font_, size_, cursor_, tab_ = iniproc.read("sqlcel.ini",
-                                                     'Foreg',
-                                                     'Backg',
-                                                     'Font',
-                                                     'Size',
-                                                     'Cursor',
-                                                     'Tab')
-# get more sqlcel.ini values here
-ofg_, obg_, ofont_ = iniproc.read("sqlcel.ini",
-                                  'Ofg',
-                                  'Obg',
-                                  'Ofont')
+# get sqlcel.ini values
+fg_, bg_, font_, size_, cursor_, tab_, ofg_, obg_, ofont_, \
+remark_, section_, literal_ = iniproc.read("sqlcel.ini",
+                                           'Foreg',
+                                           'Backg',
+                                           'Font',
+                                           'Size',
+                                           'Cursor',
+                                           'Tab',
+                                           'Ofg',
+                                           'Obg',
+                                           'Ofont',
+                                           'Remark',
+                                           'Section',
+                                           'Literal'
+                                          )
 
 tbl_info = ""
 SQL_file = ""
@@ -59,7 +63,6 @@ def edit_check():
 
 def open_sql(e=None):
     ''' Dialog to load SQL code file '''
-    print("open_sql")
     global SQL_file
     if edit_check() is False:
         return
@@ -72,7 +75,6 @@ def open_sql(e=None):
             code.insert(END, content) # insert the text
             SQL_file = fsql
             code.edit_modified(False)
-
 
 def save_sql(e=None):
     ''' Dialog to save the SQL code file '''
@@ -105,7 +107,7 @@ def file_save(event=None):
 
 def add_df_src():
     '''
-    Dialog to locate input file and insert lines at top of SQL code Text widget.
+    Dialog to locate input file and insert lines at cursor of code Text widget.
     Example:
                 Input;
                 Excelfiles/abcd1.xlsx
@@ -131,6 +133,7 @@ def quit_sql(event=None):
     if messagebox.askokcancel('SequelCell', 'OK to Exit?') is True:
         with open("winfoxy", "w") as fout:
             fout.write(str(root.winfo_x()) + "\n" + str(root.winfo_y()))
+        t.cancel()  # stop the syntax colorize timer
         root.destroy()
 
 
@@ -620,6 +623,34 @@ def pop2func(n):
     else:  # Select All
         select_all()
 
+def highlite():
+    '''  '''
+    global t
+    highlight_pattern(r'#.*\n', "remarks", regexp=True)
+    highlight_pattern(r'.*;\n', "sections", regexp=True)
+    highlight_pattern(r'\".*\"', "literals", regexp=True)
+
+    t = threading.Timer(2, highlite)
+    t.start()
+
+def highlight_pattern(pattern, tag, start="1.0", end="end", regexp=False):
+    start = code.index(start)
+    end = code.index(end)
+    code.tag_remove(tag, start, end)
+    code.mark_set("matchStart", start)
+    code.mark_set("matchEnd", start)
+    code.mark_set("searchLimit", end)
+
+    count = IntVar()
+    while True:
+        index = code.search(pattern, "matchEnd","searchLimit",
+                            count=count, regexp=True)
+        if index == "": break
+        if count.get() == 0: break # degenerate pattern which matches zero-length strings
+        code.mark_set("matchStart", index)
+        code.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+        code.tag_add(tag, "matchStart", "matchEnd")
+
 #
 #    Check if console execution requested
 #       arg 1 is the SQL code file name
@@ -630,7 +661,9 @@ if len(sys.argv) > 1:
     logging.basicConfig(filename='log_sqlcel.txt', level=logging.NOTSET,
                         format='%(asctime)s - %(levelname)s - %(message)s')
     logging.debug("sqlcel.py - console run started: " + SQL_file)
+
     processCodeFile()
+
     sys.exit()
 
 
@@ -679,9 +712,13 @@ code['yscrollcommand'] = scrollY.set
 scrollX = Scrollbar(frm_sql, orient=HORIZONTAL, command=code.xview)
 scrollX.grid(row=6, column=2, sticky='sew')
 code['xscrollcommand'] = scrollX.set
+code.tag_configure("literals", foreground=literal_)
+code.tag_configure("remarks", foreground=remark_)
+code.tag_configure("sections", foreground=section_)
+
 
 splash = '''
-Welcome
+Welcome!
 This is the code area.
 Begin coding a query here.
 Or, open an existing query.
@@ -760,7 +797,6 @@ popup_disp.add_separator()
 popup_disp.add_command(label="Select All", command=lambda: pop2func(3))
 txt.bind("<Button-3>", do_popup2)
 
-
 # Row 4
 Sizegrip(root).grid(row=4, column=1, sticky="se")
 
@@ -774,6 +810,7 @@ root.columnconfigure(1, weight=1)  # Sql frame
 frm_out.columnconfigure(1, weight=1, pad=10)  # Output frame
 frm_out.rowconfigure(1, weight=1, pad=10)  # Output frame
 
+
 #
 # Hot Keys
 #
@@ -786,7 +823,7 @@ root.bind('<Control-e>', processCodeFile)
 root.bind('<Control-o>', open_sql)
 
 
-# root.geometry("200x120") # WxH+left+top
+# Restore App to last position on user screen
 if os.path.isfile("winfoxy"):
     lcoor = tuple(open("winfoxy", 'r'))  # no relative path for this
     root.geometry('880x640+%d+%d'%(int(lcoor[0].strip()), int(lcoor[1].strip())))
@@ -795,5 +832,7 @@ else:
 
 root.minsize(880, 640)
 root.title("SequelCell V2.2")
+
+highlite()  # start the syntax colorization timer loop
 
 root.mainloop()
