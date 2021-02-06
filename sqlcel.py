@@ -75,6 +75,7 @@ def open_sql(e=None):
             code.insert(END, content) # insert the text
             SQL_file = fsql
             code.edit_modified(False)
+            frm_sql.config(text="     SQL Code " + "- " + os.path.basename(fsql) + "   ")
 
 def save_sql(e=None):
     ''' Dialog to save the SQL code file '''
@@ -83,7 +84,8 @@ def save_sql(e=None):
                                          initialdir=os.path.dirname(os.path.abspath(__file__)))
     if fsave:
         SQL_file = fsave
-        file_save("")
+        file_save(None)
+        frm_sql.config(text="     SQL Code " + "- " + os.path.basename(SQL_file) + "   ")
 
 
 def file_save(event=None):
@@ -488,7 +490,7 @@ def exec_sql(sql):
         route_msg("SQL File", "Something wrong with input declarations", "error")
         return
     if not sql_code.lower().lstrip().startswith("select"):
-        route_msg("SQL File", "Only 'SELECT' statement allowed here", "error")
+        route_msg("SQL File", "Code missing in one or more sections.", "error")
         return
 
 
@@ -518,10 +520,10 @@ def exec_sql(sql):
 
     if list_of_cols[0] == "*":
         # ALL COLUMNS '*' WORKS ONLY WITH ONE FILE REQUEST IN THE CODE FILE
-        dataframe = create_df(sql_infile[0], sql_sheet[0])  # return df from file type
-        dataframe.to_sql(sql_tbl[0], engine, if_exists='replace', index=0)
-        # dataframe.info(verbose = True, null_counts = False)
         try:
+            dataframe = create_df(sql_infile[0], sql_sheet[0])  # return df from file type
+            dataframe.to_sql(sql_tbl[0], engine, if_exists='replace', index=0)
+            # dataframe.info(verbose = True, null_counts = False)
             results = engine.execute(sql_code)
             final = pd.DataFrame(results, columns=dataframe.columns)
         except Exception as e:
@@ -626,11 +628,11 @@ def pop2func(n):
 def highlite():
     '''  '''
     global t
-    highlight_pattern(r'#.*\n', "remarks", regexp=True)
-    highlight_pattern(r'.*;\n', "sections", regexp=True)
-    highlight_pattern(r'\".*\"', "literals", regexp=True)
+    highlight_pattern(r'^[IiSsOo].*;\n', "sections", regexp=True)
+    highlight_pattern(r"[\"\'](.*?)[\'\"]", "literals", regexp=True)
+    highlight_pattern(r'^#.*\n', "remarks", regexp=True)
 
-    t = threading.Timer(2, highlite)
+    t = threading.Timer(1.25, highlite)  # every 1.5 seconds
     t.start()
 
 def highlight_pattern(pattern, tag, start="1.0", end="end", regexp=False):
@@ -683,8 +685,9 @@ style.configure("TButton", width=9)
 # SQL Code Frame
 #
 
-frm_sql = LabelFrame(root, text="     SQL Code ")
+frm_sql = LabelFrame(root)
 frm_sql.grid(row=1, column=1, pady=4, padx=5, sticky='w')
+frm_sql.config(text="     SQL Code ")
 
 btn_open = Button(frm_sql, text='Open', command=open_sql)
 btn_open.grid(row=1, column=1, sticky='w', padx=5, pady=5)
@@ -697,12 +700,12 @@ btn_exec.grid(row=4, column=1, pady=5, padx=5, sticky='w')
 btn_quit = Button(frm_sql, text='Quit', command=quit_sql)
 btn_quit.grid(row=5, column=1, pady=5, padx=5, sticky='w')
 code = Text(frm_sql, bg=bg_, fg=fg_, padx=5)
-code.grid(row=1, column=2, rowspan=5, sticky='w', padx=5, pady=5)
+code.grid(row=1, column=2, rowspan=5, sticky='nsew', padx=5, pady=5)
 efont = Font(family=font_, size=size_)
 code.config(font=efont)
 code.config(wrap=NONE, # wrap = "word"
             undo=True, # Tk 8.4
-            height=11,
+            height=12,
             width=80,
             insertbackground=cursor_,
             tabs=(efont.measure(' ' * int(tab_)), ))
@@ -718,10 +721,10 @@ code.tag_configure("sections", foreground=section_)
 
 
 splash = '''
-Welcome!
-This is the code area.
-Begin coding a query here.
-Or, open an existing query.
+Welcome to SequelCell 2.2
+This is the code area
+Begin coding a query here
+Or Open an existing query
 '''
 code.delete("1.0", END) # clear the Text widget
 code.insert(END, splash) # insert the text
@@ -826,9 +829,9 @@ root.bind('<Control-o>', open_sql)
 # Restore App to last position on user screen
 if os.path.isfile("winfoxy"):
     lcoor = tuple(open("winfoxy", 'r'))  # no relative path for this
-    root.geometry('880x640+%d+%d'%(int(lcoor[0].strip()), int(lcoor[1].strip())))
+    root.geometry('960x640+%d+%d'%(int(lcoor[0].strip()), int(lcoor[1].strip())))
 else:
-    root.geometry("880x640") # WxH+left+top
+    root.geometry("960x640") # WxH+left+top
 
 root.minsize(880, 640)
 root.title("SequelCell V2.2")
