@@ -30,20 +30,21 @@ pd.set_option('display.max_colwidth', None)
 
 # get sqlcel.ini values
 fg_, bg_, font_, size_, cursor_, tab_, ofg_, obg_, ofont_, \
-remark_, section_, literal_ = iniproc.read("sqlcel.ini",
-                                           'Foreg',
-                                           'Backg',
-                                           'Font',
-                                           'Size',
-                                           'Cursor',
-                                           'Tab',
-                                           'Ofg',
-                                           'Obg',
-                                           'Ofont',
-                                           'Remark',
-                                           'Section',
-                                           'Literal'
-                                          )
+remark_, section_, literal_, number_ = iniproc.read("sqlcel.ini",
+                                                    'Foreg',
+                                                    'Backg',
+                                                    'Font',
+                                                    'Size',
+                                                    'Cursor',
+                                                    'Tab',
+                                                    'Ofg',
+                                                    'Obg',
+                                                    'Ofont',
+                                                    'Remark',
+                                                    'Section',
+                                                    'Literal',
+                                                    'Number'
+                                                    )
 
 tbl_info = ""
 SQL_file = ""
@@ -185,7 +186,7 @@ def df_info_view():
                 else:
                     df = pd.read_excel(tsel, sheet_name=item, parse_dates=True)
             elif tsel.lower().endswith("csv"):
-                df = pd.read_csv(tsel)
+                df = pd.read_csv(tsel, encoding='utf-8')
             else:
                 route_msg("Invalid Selection", "Preview only CSV and XLS(X) files", "warning")
                 return
@@ -319,12 +320,12 @@ def create_df(filename, n):
                 df = pd.read_excel(filename, sheet_name=n, parse_dates=True)
             df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('(', '').str.replace(')', '')
         elif filename.endswith('csv'):
-            df = pd.read_csv(filename, parse_dates=True)
+            df = pd.read_csv(filename, parse_dates=True, encoding='utf-8')
             df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('(', '').str.replace(')', '')
         else:
-            engine = create_engine('sqlite:///' + filename, echo=False)
+            engine = create_engine('sqlite:///' + filename, echo=False, encoding = 'utf-8')
             conn = engine.connect()
-            df = pd.read_sql_table(n, conn, parse_dates=True)
+            df = pd.read_sql_table(n, conn, parse_dates=True, encoding='utf-8')
             conn.close()
         return df
     except Exception as e:
@@ -407,7 +408,7 @@ def processCodeFile(e=None):
                     else:
                         df = pd.read_excel(tsel, sheet_name=item, parse_dates=True)
                 elif tsel.lower().endswith("csv"):
-                    df = pd.read_csv(tsel)
+                    df = pd.read_csv(tsel, encoding='utf-8')
                 else:
                     route_msg("Invalid Selection", "Preview only CSV and XLS(X) files", "error")
                     return  # preview of Sqlite is not implemented
@@ -497,7 +498,7 @@ def exec_sql(sql):
     # CONNECT DATAFRAMES TO SQL ENGINE, CREATE TABLES AND EXECUTE SQL
 
 
-    engine = create_engine('sqlite://', echo=False)
+    engine = create_engine('sqlite://', echo=False, encoding = 'utf-8')
 
     cols = between(sql_code, "select ", " from ")
     scols = ""
@@ -559,7 +560,7 @@ def exec_sql(sql):
         elif outpath.lower().endswith("csv"):
             final.to_csv(outpath, index=False)
         else:  # assuming sqlite then
-            e = create_engine('sqlite:///' + outpath, echo=False)
+            e = create_engine('sqlite:///' + outpath, echo=False, encoding = 'utf-8')
             conn = e.connect()
             final.to_sql('table1', conn, if_exists='replace')
             conn.close()
@@ -570,7 +571,7 @@ def exec_sql(sql):
 def route_msg(title, text, typ):
     ''' directs GUI and CONSOLE runtime route_msg '''
     if RUN_CONSOLE:
-        logging.debug(title + " - " + text)
+        logging.debug(title + " - " + str(text))
         return
 
     if typ == "error":
@@ -629,6 +630,7 @@ def highlite():
     '''  '''
     global t
     highlight_pattern(r'^[IiSsOo].*;\n', "sections", regexp=True)
+    highlight_pattern(r"( |\+|-)[0-9.]+[ \n]", "numbers", regexp=True)
     highlight_pattern(r"[\"\'](.*?)[\'\"]", "literals", regexp=True)
     highlight_pattern(r'^#.*\n', "remarks", regexp=True)
 
@@ -652,6 +654,17 @@ def highlight_pattern(pattern, tag, start="1.0", end="end", regexp=False):
         code.mark_set("matchStart", index)
         code.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
         code.tag_add(tag, "matchStart", "matchEnd")
+
+def enlarge_code_frame():
+    h = code.cget("height")
+    h += 2
+    code.config(height=h)
+
+def shrink_code_frame():
+    h = code.cget("height")
+    if h > 10:
+        h -= 2
+        code.config(height=h)
 
 #
 #    Check if console execution requested
@@ -686,6 +699,7 @@ style.configure("TButton", width=9)
 #
 
 frm_sql = LabelFrame(root)
+
 frm_sql.grid(row=1, column=1, pady=4, padx=5, sticky='w')
 frm_sql.config(text="     SQL Code ")
 
@@ -699,6 +713,7 @@ btn_exec = Button(frm_sql, text='Add Input', command=add_df_src)
 btn_exec.grid(row=4, column=1, pady=5, padx=5, sticky='w')
 btn_quit = Button(frm_sql, text='Quit', command=quit_sql)
 btn_quit.grid(row=5, column=1, pady=5, padx=5, sticky='w')
+
 code = Text(frm_sql, bg=bg_, fg=fg_, padx=5)
 code.grid(row=1, column=2, rowspan=5, sticky='nsew', padx=5, pady=5)
 efont = Font(family=font_, size=size_)
@@ -709,16 +724,30 @@ code.config(wrap=NONE, # wrap = "word"
             width=80,
             insertbackground=cursor_,
             tabs=(efont.measure(' ' * int(tab_)), ))
+
 scrollY = Scrollbar(frm_sql, orient=VERTICAL, command=code.yview)
 scrollY.grid(row=1, column=3, rowspan=5, sticky='nsw')
 code['yscrollcommand'] = scrollY.set
 scrollX = Scrollbar(frm_sql, orient=HORIZONTAL, command=code.xview)
 scrollX.grid(row=6, column=2, sticky='sew')
 code['xscrollcommand'] = scrollX.set
+
+code.tag_configure("numbers", foreground=number_)
 code.tag_configure("literals", foreground=literal_)
 code.tag_configure("remarks", foreground=remark_)
 code.tag_configure("sections", foreground=section_)
 
+#
+# frame inside of frm_sql to hold sizing buttons
+#
+control_frame = Frame(frm_sql)
+control_frame.grid(row=1, column=4)
+btn_size_big = Button(control_frame, text='↑', width=2,
+                      command=shrink_code_frame)
+btn_size_big.grid(row=1, column=1, sticky='we')
+btn_size_big = Button(control_frame, text='↓', width=2,
+                      command=enlarge_code_frame)
+btn_size_big.grid(row=2, column=1, sticky='we')
 
 splash = '''
 Welcome to SequelCell 2.2
