@@ -325,7 +325,7 @@ def create_df(filename, n):
         else:
             engine = create_engine('sqlite:///' + filename, echo=False, encoding = 'utf-8')
             conn = engine.connect()
-            df = pd.read_sql_table(n, conn, parse_dates=True, encoding='utf-8')
+            df = pd.read_sql_table(n, conn, parse_dates=True)
             conn.close()
         return df
     except Exception as e:
@@ -666,6 +666,12 @@ def shrink_code_frame():
         h -= 2
         code.config(height=h)
 
+def edit_ini(e):
+    '''
+    this will have to change for hosting OS
+    '''
+    os.system("python3 edito.py sqlcel.ini")
+
 #
 #    Check if console execution requested
 #       arg 1 is the SQL code file name
@@ -751,9 +757,16 @@ btn_size_big.grid(row=2, column=1, sticky='we')
 
 splash = '''
 Welcome to SequelCell 2.2
-This is the code area
-Begin coding a query here
-Or Open an existing query
+Begin coding a query here Or Open an existing query
+  Shorcuts:
+    <Control-s>,    Quick Save
+    <Alt-s>,        Save As
+    <Control-q>,    Exit
+    <Control-a>,    Select All
+    <Escape>,       Exit
+    <Control-e>,    Execute
+    <Control-o>,    Open Sql File
+    <F7>,           Settings Editor
 '''
 code.delete("1.0", END) # clear the Text widget
 code.insert(END, splash) # insert the text
@@ -853,6 +866,7 @@ root.bind('<Control-a>', select_all)
 root.bind('<Escape>', quit_sql)
 root.bind('<Control-e>', processCodeFile)
 root.bind('<Control-o>', open_sql)
+root.bind('<F7>', edit_ini)
 
 
 # Restore App to last position on user screen
