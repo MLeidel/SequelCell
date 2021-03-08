@@ -345,7 +345,7 @@ def display_results(df):
         print(df)
     else:
         buf = io.StringIO()
-        df.info(verbose=True, null_counts=False, buf=buf)
+        df.info(verbose=True, null_counts=False, buf=buf)  # show_counts for Windows
         tbl_info = buf.getvalue()  # holds df.info string
         lst = tbl_info.split("\n")
         x = lst[1]
@@ -630,11 +630,12 @@ def highlite():
     '''  '''
     global t
     highlight_pattern(r'^[IiSsOo].*;\n', "sections", regexp=True)
-    highlight_pattern(r"( |\+|-)[0-9.]+[ \n]", "numbers", regexp=True)
-    highlight_pattern(r"[\"\'](.*?)[\'\"]", "literals", regexp=True)
+    highlight_pattern(r"(\d+|\d\.\d|\.\d)", "numbers", regexp=True)
+    highlight_pattern(r"[\"\'`](.*?)[\'\"`]", "literals", regexp=True)
     highlight_pattern(r'^#.*\n', "remarks", regexp=True)
 
     t = threading.Timer(1.25, highlite)  # every 1.5 seconds
+    t.setDaemon(True)  # for threading runtime error
     t.start()
 
 def highlight_pattern(pattern, tag, start="1.0", end="end", regexp=False):
@@ -644,7 +645,6 @@ def highlight_pattern(pattern, tag, start="1.0", end="end", regexp=False):
     code.mark_set("matchStart", start)
     code.mark_set("matchEnd", start)
     code.mark_set("searchLimit", end)
-
     count = IntVar()
     while True:
         index = code.search(pattern, "matchEnd","searchLimit",
