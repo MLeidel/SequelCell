@@ -1,0 +1,21 @@
+# COVID-19 Wisconsin Historical Data by Days
+# 447 rows (days), 104 cols Definitions: COVID-19_Historical_DEF_WI.pdf
+
+Input;
+/home/ml/apps/python/projects/sqlcel/covid/COVID-19_Historical_Data_WI.xlsx
+0
+tbl
+
+Sql;
+#select substr(date,1,10), substr(date,6,2) as month, deaths, dth_new from tbl
+#	where date > '2021-00-00'
+#	order by date
+
+select substr(date,1,7) as yr_mo, 
+		sum(deaths), sum(dth_new) from tbl
+	where date > '2020-04-00'
+	  and date < '2021-06-01'
+	group by yr_mo
+	order by yr_mo
+
+
